@@ -1,320 +1,311 @@
 # Backpropagation
 
-## 1. Neural Network Forward Propagation
+## 1. Overview
 
-For a simple neural network:
+Backpropagation is the algorithm used to calculate gradients in neural networks.
 
-Input:
-
-$$
-x
-$$
-
-Weight:
+The training process is:
 
 $$
-W
+\text{Forward Pass}
+\rightarrow
+\text{Loss}
+\rightarrow
+\text{Backward Pass}
+\rightarrow
+\text{Parameter Update}
 $$
-
-Bias:
-
-$$
-b
-$$
-
-
-Linear transformation:
-
-$$
-z = Wx+b
-$$
-
-
-Activation function:
-
-$$
-a=f(z)
-$$
-
-
-Output:
-
-$$
-\hat{y}=a
-$$
-
 
 ---
 
-# 2. Loss Function
+## 2. Forward Propagation
 
-For binary classification, Binary Cross Entropy is commonly used:
+For a two-layer neural network:
 
 $$
-L
-=
+z_1 = XW_1 + b_1
+$$
+
+$$
+a_1 = f(z_1)
+$$
+
+$$
+z_2 = a_1W_2 + b_2
+$$
+
+$$
+\hat{y} = \sigma(z_2)
+$$
+
+where:
+
+* $X$ is the input
+* $W_1$ and $W_2$ are weight matrices
+* $b_1$ and $b_2$ are bias vectors
+* $f$ is the hidden-layer activation function
+* $\sigma$ is the sigmoid function
+* $\hat{y}$ is the prediction
+
+---
+
+## 3. Loss Function
+
+For binary classification, the binary cross-entropy loss is:
+
+$$
+L =
 -\frac{1}{m}
 \sum_{i=1}^{m}
-\left(
-y_i\log(\hat y_i)
+\left[
+y_i\log(\hat{y}_i)
 +
-(1-y_i)\log(1-\hat y_i)
-\right)
+(1-y_i)\log(1-\hat{y}_i)
+\right]
 $$
 
-
-The goal is to minimize the loss:
+The objective is to minimize:
 
 $$
-\min_W L
+\min_{\theta} L
 $$
 
+where $\theta$ represents all model parameters.
 
 ---
 
-# 3. Chain Rule
+## 4. Chain Rule
 
-The core idea of backpropagation is the chain rule:
+Backpropagation is based on the chain rule.
 
-$$
-\frac{\partial L}{\partial W}
-=
-\frac{\partial L}{\partial a}
-\frac{\partial a}{\partial z}
-\frac{\partial z}{\partial W}
-$$
-
-
-Backpropagation propagates errors from the output layer back to the input layer.
-
----
-
-# 4. Single Neuron Backpropagation
-
-Forward propagation:
+If:
 
 $$
-z=wx+b
+L = L(a)
 $$
 
-
 $$
-a=f(z)
-$$
-
-
-Loss:
-
-$$
-L=\frac12(a-y)^2
+a = f(z)
 $$
 
-
----
-
-## Gradient of Output
-
-First:
-
 $$
-\frac{\partial L}{\partial a}
-=
-a-y
+z = wx+b
 $$
 
-
-Derivative of activation function:
-
-$$
-\frac{\partial a}{\partial z}
-=
-f'(z)
-$$
-
-
-Therefore:
+then:
 
 $$
-\delta
-=
-\frac{\partial L}{\partial z}
-=
-(a-y)f'(z)
-$$
-
-
----
-
-## Weight Gradient
-
-
-Since:
-
-$$
-z=wx+b
-$$
-
-
-we have:
-
-$$
-\frac{\partial z}{\partial w}=x
-$$
-
-
-Therefore:
-
-$$
-\boxed{
 \frac{\partial L}{\partial w}
-=
-\delta x
-}
+=============================
+
+\frac{\partial L}{\partial a}
+\frac{\partial a}{\partial z}
+\frac{\partial z}{\partial w}
 $$
 
-
-Bias gradient:
-
-$$
-\boxed{
-\frac{\partial L}{\partial b}
-=
-\delta
-}
-$$
-
+The gradient is propagated from the output layer toward the input layer.
 
 ---
 
-# 5. Multi-layer Neural Network
+## 5. Output Layer Gradients
 
-Consider a two-layer neural network.
-
-Hidden layer:
-
-$$
-z_1=W_1x+b_1
-$$
-
-
-$$
-h=f(z_1)
-$$
-
-
-Output layer:
-
-$$
-z_2=W_2h+b_2
-$$
-
-
-$$
-\hat y=f(z_2)
-$$
-
-
----
-
-# 6. Output Layer Gradient
-
-
-Output error:
+For sigmoid output and binary cross-entropy loss:
 
 $$
 \delta_2
-=
-\frac{\partial L}{\partial z_2}
+========
+
+# \frac{\partial L}{\partial z_2}
+
+\hat{y}-y
 $$
 
-
-Weight gradient:
+The output-layer weight gradient is:
 
 $$
 \frac{\partial L}{\partial W_2}
-=
-\delta_2 h^T
+===============================
+
+\frac{1}{m}a_1^T\delta_2
 $$
 
-
-Bias gradient:
+The output-layer bias gradient is:
 
 $$
 \frac{\partial L}{\partial b_2}
-=
-\delta_2
-$$
+===============================
 
+\frac{1}{m}
+\sum_{i=1}^{m}\delta_2^{(i)}
+$$
 
 ---
 
-# 7. Hidden Layer Gradient
+## 6. Hidden Layer Gradients
 
-
-Hidden layer error:
+The error propagated to the hidden layer is:
 
 $$
 \delta_1
-=
-(W_2^T\delta_2)
+========
+
+(\delta_2W_2^T)
 \odot
 f'(z_1)
 $$
 
+where $\odot$ represents element-wise multiplication.
 
-where:
-
-$$
-\odot
-$$
-
-represents element-wise multiplication.
-
-
-Hidden layer weight gradient:
+The hidden-layer weight gradient is:
 
 $$
 \frac{\partial L}{\partial W_1}
-=
-\delta_1 x^T
+===============================
+
+\frac{1}{m}X^T\delta_1
 $$
 
-
-Hidden layer bias gradient:
+The hidden-layer bias gradient is:
 
 $$
 \frac{\partial L}{\partial b_1}
-=
-\delta_1
-$$
+===============================
 
+\frac{1}{m}
+\sum_{i=1}^{m}\delta_1^{(i)}
+$$
 
 ---
 
-# 8. Gradient Descent Update
+## 7. Sigmoid Derivative
 
-
-Parameters are updated using gradient descent:
-
-$$
-W=W-\eta\frac{\partial L}{\partial W}
-$$
-
+The sigmoid function is:
 
 $$
-b=b-\eta\frac{\partial L}{\partial b}
+\sigma(z)
+=========
+
+\frac{1}{1+e^{-z}}
 $$
 
-
-where:
+Its derivative is:
 
 $$
+\sigma'(z)
+==========
+
+\sigma(z)(1-\sigma(z))
+$$
+
+---
+
+## 8. Parameter Update
+
+Gradient descent updates the parameters as follows:
+
+$$
+W_1
+\leftarrow
+W_1
+---
+
 \eta
+\frac{\partial L}{\partial W_1}
 $$
 
-is the learning rate.
+$$
+b_1
+\leftarrow
+b_1
+---
+
+\eta
+\frac{\partial L}{\partial b_1}
+$$
+
+$$
+W_2
+\leftarrow
+W_2
+---
+
+\eta
+\frac{\partial L}{\partial W_2}
+$$
+
+$$
+b_2
+\leftarrow
+b_2
+---
+
+\eta
+\frac{\partial L}{\partial b_2}
+$$
+
+where $\eta$ is the learning rate.
 
 ---
 
-# 9. Backpropagation Algorithm
+## 9. Algorithm
+
+1. Initialize weights and biases.
+2. Perform forward propagation.
+3. Compute the loss.
+4. Calculate output-layer gradients.
+5. Propagate the error to the hidden layer.
+6. Calculate hidden-layer gradients.
+7. Update all parameters.
+8. Repeat until the loss converges.
+
+---
+
+## 10. Gradient Checking
+
+A numerical gradient can be approximated by:
+
+$$
+\frac{\partial L}{\partial \theta}
+\approx
+\frac{
+L(\theta+\epsilon)
+------------------
+
+L(\theta-\epsilon)
+}{
+2\epsilon
+}
+$$
+
+The numerical gradient should be close to the backpropagation gradient.
+
+---
+
+## 11. Summary
+
+Backpropagation combines the chain rule with gradient descent:
+
+$$
+\text{Backpropagation}
+======================
+
+\text{Chain Rule}
++
+\text{Gradient Calculation}
+$$
+
+The complete learning process is:
+
+$$
+\text{Forward}
+\rightarrow
+\text{Loss}
+\rightarrow
+\text{Backward}
+\rightarrow
+\text{Update}
+$$
+
+Backpropagation is the foundation of training neural networks, including CNNs, RNNs, Transformers, and diffusion models.
+
 
