@@ -26,7 +26,6 @@ void initList(SqList &L) {
 
 /* 插入操作 */
 bool listInsert(SqList &L, int i, ElemType e) {
-
 	    /* 判断插入位置是否合法 */
 	    if (i < 1 || i > L.length + 1) {
 		            return false;
@@ -51,8 +50,48 @@ bool listInsert(SqList &L, int i, ElemType e) {
 			        return true;
 }
 
+/* 删除操作 */
+bool listDelete(SqList &L, int i, ElemType &e) {
+	    /* 判断删除位置是否合法 */
+	    if (i < 1 || i > L.length) {
+		            return false;
+			        }
+
+	        /* 保存被删除的元素 */
+	        e = L.data[i - 1];
+
+		    /* 将第 i 个位置之后的元素向前移动 */
+		    for (int j = i; j < L.length; j++) {
+			            L.data[j - 1] = L.data[j];
+				        }
+
+		        /* 顺序表长度减 1 */
+		        L.length--;
+
+			    return true;
+}
+
+/* 按值查找 */
+int locateElem(const SqList &L, ElemType e) {
+	    for (int i = 0; i < L.length; i++) {
+		            if (L.data[i] == e) {
+				                /* 返回逻辑位置 */
+				                return i + 1;
+						        }
+			        }
+
+	        /* 查找失败 */
+	        return 0;
+}
+
+/* 按位查找 */
+ElemType getElem(const SqList &L, int i) {
+	    /* 假设传入的位置合法 */
+	    return L.data[i - 1];
+}
+
 /* 打印顺序表 */
-void printList(SqList &L) {
+void printList(const SqList &L) {
 	    cout << "length = " << L.length << endl;
 
 	        cout << "data: ";
@@ -67,14 +106,38 @@ void printList(SqList &L) {
 int main() {
 	    SqList L;
 
+	        /* 初始化 */
 	        initList(L);
 
+		    /* 插入元素 */
 		    listInsert(L, 1, 10);
 		        listInsert(L, 2, 20);
 			    listInsert(L, 3, 30);
 			        listInsert(L, 2, 15);
 
-				    printList(L);
+				    cout << "After insertion:" << endl;
+				        printList(L);
 
-				        return 0;
+					    /* 按位查找 */
+					    cout << "Element at position 3: "
+						             << getElem(L, 3) << endl;
+
+					        /* 按值查找 */
+					        int position = locateElem(L, 20);
+
+						    cout << "Position of 20: "
+							             << position << endl;
+
+						        /* 删除元素 */
+						        ElemType deletedElem;
+
+							    if (listDelete(L, 2, deletedElem)) {
+								            cout << "Deleted element: "
+										                 << deletedElem << endl;
+									        }
+
+							        cout << "After deletion:" << endl;
+								    printList(L);
+
+								        return 0;
 }
